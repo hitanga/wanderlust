@@ -17,42 +17,34 @@ export default function Contact() {
     message: ''
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    try {
-      // Save to Firestore
-      await addDoc(collection(db, 'contacts'), {
-        ...formData,
-        createdAt: serverTimestamp()
-      });
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError(null);
 
-      // Send email via backend API
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
+  try {
+    // Save to Firestore only
+    await addDoc(collection(db, "contacts"), {
+      ...formData,
+      createdAt: serverTimestamp(),
+    });
 
-      const data = await response.json();
+    setSuccess(true);
+    setFormData({
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    });
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to send email');
-      }
-
-      setSuccess(true);
-      setFormData({ name: '', email: '', subject: '', message: '' });
-      setTimeout(() => setSuccess(false), 5000);
-    } catch (err: any) {
-      console.error('Error sending message:', err);
-      setError(err.message || 'Failed to send message. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    setTimeout(() => setSuccess(false), 5000);
+  } catch (err) {
+    console.error(err);
+    setError("Failed to send message");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const contactInfo = [
     { icon: Phone, label: 'Call Us', value: '+1 234 567 890', color: 'bg-blue-500' },
