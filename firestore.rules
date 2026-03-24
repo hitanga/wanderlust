@@ -1,0 +1,85 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: blogs
+    // Fields:
+    //   - title: string (required, 1-100 chars)
+    //   - imageUrl: string (required, valid URL)
+    //   - description: string (required, 1-5000 chars)
+    //   - createdAt: timestamp (required)
+    //   - authorUid: string (required, matches auth.uid)
+    //
+    // Collection: users
+    // Fields:
+    //   - email: string (required, valid email)
+    //   - role: string (required, 'admin' or 'user')
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+          (request.auth.token.email.lower() == "hitanga@gmail.com") && request.auth.token.email_verified == true);
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidBlog(data) {
+      return data.keys().hasAll(['title', 'imageUrl', 'description', 'createdAt', 'authorUid']) &&
+             data.keys().hasOnly(['title', 'imageUrl', 'description', 'createdAt', 'authorUid', 'updatedAt', 'views']) &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+             data.imageUrl is string && (data.imageUrl.matches("^https?://.*") || data.imageUrl.matches("^data:image/.*")) &&
+             data.description is string && data.description.size() >= 1 && data.description.size() <= 1000000 &&
+             data.createdAt is timestamp &&
+             data.authorUid == request.auth.uid &&
+             (!('views' in data) || data.views is number) &&
+             (!('updatedAt' in data) || data.updatedAt is timestamp);
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['email', 'role']) &&
+             data.keys().hasOnly(['email', 'role']) &&
+             data.email is string && data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
+             data.role in ['admin', 'user'];
+    }
+
+    // Rules
+    match /blogs/{blogId} {
+      allow read: if true; // Publicly readable
+      allow create: if isAdmin() && isValidBlog(request.resource.data);
+      allow update: if (isAdmin() && isValidBlog(request.resource.data) && request.resource.data.authorUid == resource.data.authorUid) ||
+                    (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views']) && 
+                     request.resource.data.views == (resource.data.get('views', 0) + 1));
+      allow delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() && isOwner(userId) && isValidUser(request.resource.data) && (request.resource.data.role == 'user' || isAdmin());
+      allow update: if isAdmin() && isValidUser(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /contacts/{contactId} {
+      allow create: if true; // Anyone can send a message
+      allow read, delete: if isAdmin();
+    }
+
+    match /newsletter_subscribers/{subscriberId} {
+      allow create: if true; // Anyone can subscribe
+      allow read, delete: if isAdmin();
+    }
+  }
+}

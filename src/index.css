@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-poppins: "Poppins", sans-serif;
+  --font-roboto: "Roboto", sans-serif;
+}
+
+/* Custom Quill Styles */
+.quill-editor .ql-toolbar.ql-snow {
+  border: none;
+  border-bottom: 1px solid #f3f4f6;
+  background: #ffffff;
+  padding: 1rem;
+}
+
+.quill-editor .ql-container.ql-snow {
+  border: none;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  min-height: 300px;
+}
+
+.quill-editor .ql-editor {
+  padding: 1.5rem;
+  line-height: 1.8;
+}
+
+.quill-editor .ql-editor.ql-blank::before {
+  left: 1.5rem;
+  color: #9ca3af;
+  font-style: normal;
+}
+
+/* Blog Content Styles (for BlogDetail) */
+.blog-content {
+  line-height: 1.8;
+  color: #374151;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  word-wrap: break-word !important;
+}
+
+.blog-content p {
+  margin-bottom: 1.5rem;
+  white-space: normal !important;
+}
+
+.blog-content h1, .blog-content h2, .blog-content h3 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  color: #212529;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.blog-content h1 { font-size: 2.25rem; }
+.blog-content h2 { font-size: 1.875rem; }
+.blog-content h3 { font-size: 1.5rem; }
+
+.blog-content ul, .blog-content ol {
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+.blog-content ul { list-style-type: disc; }
+.blog-content ol { list-style-type: decimal; }
+
+.blog-content img {
+  border-radius: 1.5rem;
+  margin: 2rem 0;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+

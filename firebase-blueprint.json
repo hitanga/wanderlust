@@ -1,0 +1,92 @@
+{
+  "entities": {
+    "blog": {
+      "title": "Blog Post",
+      "description": "A travel blog post containing title, image, and description.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The title of the blog post."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "The URL of the blog post's featured image."
+        },
+        "description": {
+          "type": "string",
+          "description": "The full content or description of the blog post."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the blog was created."
+        },
+        "authorUid": {
+          "type": "string",
+          "description": "The UID of the admin who created the blog."
+        }
+      },
+      "required": ["title", "imageUrl", "description", "createdAt", "authorUid"]
+    },
+    "user": {
+      "title": "User Profile",
+      "description": "User profile information including role.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "The user's email address."
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "user"],
+          "description": "The user's role in the application."
+        }
+      },
+      "required": ["email", "role"]
+    },
+    "contact": {
+      "title": "Contact Message",
+      "description": "A message sent via the contact form.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "subject": { "type": "string" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "subject", "message", "createdAt"]
+    },
+    "newsletter_subscriber": {
+      "title": "Newsletter Subscriber",
+      "description": "A user who has subscribed to the newsletter.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "subscribedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "subscribedAt"]
+    }
+  },
+  "firestore": {
+    "/blogs/{blogId}": {
+      "schema": "blog",
+      "description": "Collection of travel blog posts."
+    },
+    "/users/{userId}": {
+      "schema": "user",
+      "description": "User profiles and roles."
+    },
+    "/contacts/{contactId}": {
+      "schema": "contact",
+      "description": "Messages from the contact form."
+    },
+    "/newsletter_subscribers/{subscriberId}": {
+      "schema": "newsletter_subscriber",
+      "description": "List of newsletter subscribers."
+    }
+  }
+}
